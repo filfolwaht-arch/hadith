@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/explain-hadith.js": {
+      "runtime": "edge"
+    }
+  }
+}
