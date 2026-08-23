@@ -1,0 +1,1411 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>موسوعة الحديث النبوي</title>
+<meta name="description" content="موسوعة رقمية تفاعلية للأحاديث النبوية — بحث، تصفح، إسناد، ومصادر موثوقة.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* =====================================================================
+   موسوعة الحديث النبوي — Design System
+   هوية بصرية مستقلة عن الموسوعة التاريخية: نفس العائلة (أخضر/ذهبي/كريمي)
+   لكن بمرجعية "الإسناد" كعنصر تصميمي مميّز — سلسلة/خيط ذهبي يربط العناصر،
+   بدل الطابع "المتحفي" للموسوعة التاريخية. هذا هو التوقيع البصري (signature).
+   ===================================================================== */
+:root{
+  /* Dark — الوضع الأساسي: مداد وجلد (Ink & Vellum) */
+  --bg:#0B1613;
+  --surface:#122019;
+  --surface-2:#17281F;
+  --cream:#F3EEDF;
+  --white:#FFFFFF;
+  --green:#1E5C46;
+  --green-2:#153F30;
+  --green-3:#2E8763;
+  --gold:#C7A059;
+  --gold-bright:#E6C077;
+  --isnad:#8FAE99;       /* لون خيط الإسناد */
+  --grade-sahih:#3F8F5C;
+  --grade-hasan:#B08A2E;
+  --grade-daif:#A85454;
+  --grade-unknown:#6B7672;
+  --heading:var(--gold);
+  --ink:#EFEADC;
+  --ink-dim:#A6B6AC;
+  --border:rgba(199,160,89,.22);
+  --radius:14px;
+  --radius-sm:9px;
+  --shadow:0 16px 38px rgba(0,0,0,.38);
+  --shadow-lg:0 28px 64px rgba(0,0,0,.52);
+  --glass:rgba(18,32,25,.6);
+  --font-ui:'Cairo',sans-serif;
+  --font-ar:'Amiri',serif;
+  color-scheme:dark;
+}
+html[data-theme="light"]{
+  --bg:#F8F4E9;
+  --surface:#FFFFFF;
+  --surface-2:#F1EAD6;
+  --green:#134634;
+  --green-2:#0E3627;
+  --green-3:#1C6A4C;
+  --heading:#134634;
+  --ink:#1D2A24;
+  --ink-dim:#66766C;
+  --border:#E7DCBE;
+  --isnad:#4C6E5A;
+  --shadow:0 16px 38px rgba(30,40,30,.10);
+  --shadow-lg:0 28px 64px rgba(30,40,30,.16);
+  --glass:rgba(255,255,255,.68);
+  color-scheme:light;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:var(--font-ui);line-height:1.85;
+  transition:background-color .35s ease,color .35s ease;
+}
+a{color:inherit;text-decoration:none;}
+img{max-width:100%;display:block;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+::selection{background:var(--gold);color:#1a1a1a;}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;}
+html{scrollbar-width:thin;}
+.container{max-width:1180px;margin:0 auto;padding:0 22px;}
+h1,h2,h3,.hadith-text,.display{font-family:var(--font-ar);}
+
+/* ---------- Loader ---------- */
+#site-loader{
+  position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:16px;background:var(--bg);
+  transition:opacity .5s ease,visibility .5s ease;
+}
+#site-loader .chain{display:flex;gap:8px;}
+#site-loader .link{
+  width:9px;height:9px;border-radius:50%;background:var(--gold);
+  animation:link-pulse 1.4s ease-in-out infinite;
+}
+#site-loader .link:nth-child(2){animation-delay:.15s;}
+#site-loader .link:nth-child(3){animation-delay:.3s;}
+#site-loader .link:nth-child(4){animation-delay:.45s;}
+#site-loader .link:nth-child(5){animation-delay:.6s;}
+@keyframes link-pulse{0%,100%{opacity:.25;transform:scale(.8);}50%{opacity:1;transform:scale(1.15);}}
+#site-loader .msg{font-family:var(--font-ar);font-size:15px;color:var(--ink-dim);}
+#site-loader.hide{opacity:0;visibility:hidden;pointer-events:none;}
+
+/* ---------- Utility bar ---------- */
+#utility-bar{background:var(--green);color:#DCEAE0;font-size:12.5px;}
+#utility-bar .bar{display:flex;justify-content:space-between;align-items:center;padding:7px 22px;}
+#utility-bar .note{color:#AECABB;}
+
+/* ---------- Nav ---------- */
+#topnav{position:sticky;top:0;z-index:40;background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--border);}
+#topnav .bar{display:flex;align-items:center;justify-content:space-between;padding:13px 22px;gap:18px;}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand .mark{
+  width:36px;height:36px;border-radius:50%;background:var(--green);color:var(--gold-bright);
+  display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;
+  font-family:var(--font-ar);
+}
+.brand .txt{display:flex;flex-direction:column;line-height:1.2;}
+.brand .txt b{font-family:var(--font-ar);font-size:16.5px;color:var(--heading);}
+.brand .txt span{font-size:10px;color:var(--ink-dim);}
+#nav-links{display:flex;gap:2px;}
+#nav-links a{padding:8px 13px;border-radius:8px;font-size:13px;font-weight:600;color:var(--ink-dim);transition:.12s;}
+#nav-links a:hover,#nav-links a.active{background:var(--surface-2);color:var(--heading);}
+.nav-right{display:flex;align-items:center;gap:8px;}
+.icon-btn{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--ink-dim);transition:.12s;font-size:15px;}
+.icon-btn:hover{background:var(--surface-2);color:var(--heading);}
+.lang-group{display:flex;gap:2px;background:var(--surface-2);border-radius:8px;padding:2px;}
+.lang-group button{padding:5px 9px;border-radius:6px;font-size:11.5px;font-weight:700;color:var(--ink-dim);}
+.lang-group button.active{background:var(--green);color:#fff;}
+@media(max-width:860px){#nav-links{display:none;}}
+
+/* ---------- Bottom nav (mobile) ---------- */
+#bottom-nav{
+  position:fixed;bottom:0;inset-inline:0;z-index:40;display:none;
+  background:var(--surface);border-top:1px solid var(--border);
+  padding:8px 6px calc(8px + env(safe-area-inset-bottom));
+}
+@media(max-width:860px){#bottom-nav{display:flex;justify-content:space-around;}}
+.bn-item{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;color:var(--ink-dim);padding:4px 8px;border-radius:8px;}
+.bn-item .ic{font-size:17px;}
+.bn-item.active{color:var(--heading);}
+
+/* ---------- Hero ---------- */
+.hero{position:relative;padding:64px 0 40px;overflow:hidden;}
+.hero::before{
+  content:"";position:absolute;inset:0;z-index:-1;
+  background:radial-gradient(120% 90% at 50% -10%, var(--green-2) 0%, var(--bg) 60%);
+  opacity:.9;
+}
+.hero-inner{text-align:center;max-width:760px;margin:0 auto;}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.06em;color:var(--gold-bright);font-weight:700;margin-bottom:14px;}
+.eyebrow::before,.eyebrow::after{content:"";width:22px;height:1px;background:var(--gold);opacity:.6;}
+.hero h1{font-size:clamp(30px,5.2vw,50px);color:var(--heading);margin:0 0 10px;line-height:1.25;}
+.hero p{color:var(--ink-dim);font-size:15.5px;max-width:520px;margin:0 auto 30px;}
+
+/* Search bar */
+.search-shell{max-width:620px;margin:0 auto;position:relative;}
+.search-box{
+  display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);
+  border-radius:16px;padding:14px 18px;box-shadow:var(--shadow);
+}
+.search-box input{
+  flex:1;background:none;border:none;color:var(--ink);font-family:var(--font-ar);font-size:16px;
+}
+.search-box input::placeholder{color:var(--ink-dim);font-family:var(--font-ui);}
+.search-box .go{width:38px;height:38px;border-radius:11px;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.search-modes{display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap;}
+.search-modes button{font-size:11.5px;padding:6px 12px;border-radius:20px;border:1px solid var(--border);color:var(--ink-dim);}
+.search-modes button.active{background:var(--surface-2);color:var(--heading);border-color:var(--gold);}
+
+/* Quick nav */
+.quicknav{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:34px;}
+.quicknav a{
+  display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:12px;
+  background:var(--surface);border:1px solid var(--border);font-size:13.5px;font-weight:600;color:var(--ink);
+  transition:.15s;
+}
+.quicknav a:hover{border-color:var(--gold);color:var(--heading);transform:translateY(-1px);}
+
+/* ---------- Sections ---------- */
+.section{padding:44px 0;}
+.section-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:20px;}
+.section-head .kicker{font-size:11.5px;color:var(--gold-bright);font-weight:700;letter-spacing:.04em;margin-bottom:4px;}
+.section-head h2{font-size:23px;color:var(--heading);margin:0;}
+.see-all{font-size:12.5px;font-weight:700;color:var(--ink-dim);}
+.see-all:hover{color:var(--heading);}
+
+/* Hadith-of-the-day card */
+.hadith-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:30px 28px;box-shadow:var(--shadow);position:relative;overflow:hidden;
+}
+.hadith-card::before{
+  content:"";position:absolute;inset-inline-start:0;top:0;bottom:0;width:3px;
+  background:linear-gradient(var(--gold),transparent);
+}
+.hadith-text{font-family:var(--font-ar);font-size:21px;line-height:2.1;color:var(--ink);margin:0 0 18px;}
+.hadith-meta{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:12.5px;color:var(--ink-dim);border-top:1px dashed var(--border);padding-top:14px;}
+.hadith-meta b{color:var(--ink);font-weight:700;}
+.grade-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+.grade-pill.sahih{background:rgba(63,143,92,.15);color:var(--grade-sahih);}
+.grade-pill.hasan{background:rgba(176,138,46,.15);color:var(--grade-hasan);}
+.grade-pill.daif{background:rgba(168,84,84,.15);color:var(--grade-daif);}
+.grade-pill.unknown{background:rgba(107,118,114,.15);color:var(--grade-unknown);}
+.na{color:var(--ink-dim);font-style:italic;}
+
+/* Book grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;}
+.book-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:18px;transition:.15s;
+}
+.book-card:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:var(--shadow);}
+.book-card .bnum{font-size:11px;color:var(--gold-bright);font-weight:700;margin-bottom:8px;}
+.book-card h4{font-family:var(--font-ar);font-size:17px;margin:0 0 4px;color:var(--ink);}
+.book-card .meta{font-size:12px;color:var(--ink-dim);}
+
+/* States */
+.loading,.empty,.error-state{text-align:center;padding:36px 20px;color:var(--ink-dim);font-size:13.5px;}
+.error-state{color:var(--grade-daif);}
+.skeleton{background:linear-gradient(90deg,var(--surface-2) 25%,var(--surface) 37%,var(--surface-2) 63%);background-size:400% 100%;animation:sk 1.4s ease infinite;border-radius:var(--radius-sm);height:110px;}
+@keyframes sk{0%{background-position:100% 0}100%{background-position:-100% 0}}
+
+/* Source transparency strip */
+.trust-strip{display:flex;align-items:center;gap:10px;background:var(--surface-2);border:1px dashed var(--border);border-radius:var(--radius-sm);padding:12px 16px;font-size:12px;color:var(--ink-dim);margin-top:26px;}
+.trust-strip b{color:var(--heading);}
+
+footer{padding:34px 0;border-top:1px solid var(--border);text-align:center;color:var(--ink-dim);font-size:12px;margin-bottom:70px;}
+@media(min-width:861px){footer{margin-bottom:0;}}
+.reveal{opacity:0;transform:translateY(12px);transition:opacity .5s ease,transform .5s ease;}
+.reveal.in-view{opacity:1;transform:translateY(0);}
+@media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none;}#site-loader .link{animation:none;}}
+
+/* ---------- Search page ---------- */
+.search-page-head{padding:36px 0 8px;}
+.filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:18px;}
+.filters select,.filters input{
+  width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  padding:10px 12px;color:var(--ink);font-family:inherit;font-size:13.5px;
+}
+.filters select:disabled{opacity:.45;cursor:not-allowed;}
+.filters label{display:block;font-size:11px;color:var(--ink-dim);margin-bottom:5px;font-weight:700;}
+.search-btn-row{display:flex;gap:10px;margin-top:14px;}
+.btn{padding:10px 20px;border-radius:10px;font-size:13.5px;font-weight:700;transition:.15s;}
+.btn-primary{background:var(--green);color:#fff;}
+.btn-primary:hover{background:var(--green-3);}
+.btn-outline{border:1px solid var(--border);color:var(--ink-dim);}
+.btn-outline:hover{border-color:var(--gold);color:var(--heading);}
+.disabled-note{font-size:10.5px;color:var(--ink-dim);opacity:.7;}
+
+.result-card{
+  display:block;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:18px 20px;margin-bottom:12px;transition:.15s;
+}
+.result-card:hover{border-color:var(--gold);transform:translateY(-1px);}
+.result-card .rtext{font-family:var(--font-ar);font-size:16.5px;line-height:1.95;margin:0 0 10px;}
+.result-card .rmeta{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:11.5px;color:var(--ink-dim);}
+.load-more-wrap{text-align:center;margin-top:18px;}
+
+/* ---------- Hadith detail page ---------- */
+.breadcrumbs{font-size:12px;color:var(--ink-dim);margin-bottom:18px;}
+.breadcrumbs a:hover{color:var(--heading);}
+.breadcrumbs .sep{margin:0 6px;opacity:.5;}
+.detail-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:34px 30px;box-shadow:var(--shadow-lg);}
+.detail-card .hadith-text{font-size:23px;}
+.info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:20px;padding-top:18px;border-top:1px dashed var(--border);}
+.info-item .lbl{font-size:10.5px;color:var(--ink-dim);font-weight:700;margin-bottom:4px;}
+.info-item .val{font-size:14px;color:var(--ink);}
+.isnad-box{margin-top:22px;padding:16px 18px;background:var(--surface-2);border-radius:var(--radius-sm);border:1px dashed var(--border);font-size:12.5px;color:var(--ink-dim);}
+.actions-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px;}
+.action-btn{
+  display:flex;align-items:center;gap:6px;padding:9px 14px;border-radius:10px;
+  border:1px solid var(--border);font-size:12.5px;font-weight:700;color:var(--ink-dim);transition:.15s;
+}
+.action-btn:hover{border-color:var(--gold);color:var(--heading);}
+.action-btn.saved{background:var(--gold);color:#1a1a1a;border-color:var(--gold);}
+.toast{
+  position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;
+  background:var(--green);color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;z-index:200;
+  transition:.25s;pointer-events:none;box-shadow:var(--shadow);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+@media(min-width:861px){.toast{bottom:30px;}}
+@media print{
+  #site-loader,#utility-bar,#topnav,#bottom-nav,.actions-row,.breadcrumbs,footer,.toast{display:none!important;}
+  body{background:#fff;color:#000;}
+  .detail-card{box-shadow:none;border:1px solid #ccc;}
+}
+
+/* ---------- Books / Topics / Sources / Narrator ---------- */
+.book-card.linkish{cursor:pointer;}
+.book-card .count-skel{width:60%;height:12px;border-radius:4px;margin-top:8px;}
+.topic-chip{
+  display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:20px;
+  background:var(--surface);border:1px solid var(--border);font-size:14px;font-weight:700;color:var(--ink);
+  transition:.15s;
+}
+.topic-chip:hover{border-color:var(--gold);color:var(--heading);transform:translateY(-1px);}
+.topics-wrap{display:flex;flex-wrap:wrap;gap:10px;}
+.topic-banner{
+  display:flex;align-items:center;gap:10px;background:var(--surface-2);border:1px dashed var(--border);
+  border-radius:var(--radius-sm);padding:12px 16px;font-size:12.5px;color:var(--ink-dim);margin-bottom:18px;
+}
+.source-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow);}
+.source-card h3{font-family:var(--font-ar);color:var(--heading);margin:0 0 6px;}
+.source-books-mini{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;}
+.source-books-mini span{background:var(--surface-2);border-radius:8px;padding:6px 10px;font-size:11.5px;color:var(--ink-dim);}
+.narrator-block{text-align:center;padding:50px 20px;max-width:520px;margin:0 auto;}
+.narrator-block .ic{font-size:38px;margin-bottom:14px;opacity:.6;}
+
+/* ---------- AI Explanation Panel ---------- */
+.ai-explain-btn{
+  display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:10px;
+  background:linear-gradient(135deg,var(--green),var(--green-3));color:#fff;font-size:13px;font-weight:700;
+  box-shadow:0 8px 20px rgba(30,92,70,.35);transition:.15s;
+}
+.ai-explain-btn:hover{transform:translateY(-1px);box-shadow:0 12px 26px rgba(30,92,70,.45);}
+.ai-panel{
+  margin-top:24px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:var(--shadow-lg);overflow:hidden;display:none;
+}
+.ai-panel.open{display:block;}
+.ai-panel-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);background:var(--surface-2);}
+.ai-panel-head .ttl{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:var(--heading);}
+.ai-panel-close{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--ink-dim);}
+.ai-panel-close:hover{background:var(--surface);color:var(--heading);}
+.ai-disclaimer{padding:10px 20px;font-size:11.5px;color:var(--ink-dim);background:rgba(199,160,89,.08);border-bottom:1px dashed var(--border);}
+.ai-tabs{display:flex;gap:2px;padding:10px 14px 0;overflow-x:auto;}
+.ai-tab-btn{padding:9px 14px;font-size:12.5px;font-weight:700;color:var(--ink-dim);border-radius:8px 8px 0 0;white-space:nowrap;}
+.ai-tab-btn.active{background:var(--bg);color:var(--heading);}
+.ai-tab-panels{padding:20px;min-height:120px;}
+.ai-tab-panel{display:none;font-size:14px;line-height:2;}
+.ai-tab-panel.active{display:block;}
+.ai-tab-panel :is(p,li){margin:0 0 8px;}
+.ai-tab-panel strong{color:var(--heading);}
+.ai-word-item{padding:10px 0;border-bottom:1px dashed var(--border);}
+.ai-word-item:last-child{border-bottom:none;}
+.ai-status-row{display:flex;align-items:center;gap:10px;padding:0 20px 16px;}
+.ai-typing{display:inline-flex;gap:4px;}
+.ai-typing span{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:link-pulse 1.2s ease-in-out infinite;}
+.ai-typing span:nth-child(2){animation-delay:.15s;}
+.ai-typing span:nth-child(3){animation-delay:.3s;}
+.ai-stop-btn,.ai-retry-btn{font-size:11.5px;padding:6px 12px;border-radius:8px;border:1px solid var(--border);color:var(--ink-dim);}
+.ai-stop-btn:hover,.ai-retry-btn:hover{border-color:var(--gold);color:var(--heading);}
+.scholars-unavailable{
+  display:flex;gap:10px;align-items:flex-start;background:var(--surface-2);border:1px dashed var(--border);
+  border-radius:var(--radius-sm);padding:16px;font-size:13px;color:var(--ink-dim);
+}
+.ai-ask-form{display:flex;gap:8px;margin-bottom:16px;}
+.ai-ask-form input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--ink);font-family:inherit;}
+.ai-qa-item{margin-bottom:18px;}
+.ai-qa-q{font-weight:700;color:var(--heading);margin-bottom:6px;font-size:13px;}
+.ai-qa-a{font-size:13.5px;}
+.ai-not-configured{padding:16px;text-align:center;color:var(--ink-dim);font-size:12.5px;}
+</style>
+</head>
+<body>
+
+<div id="site-loader">
+  <div class="chain"><span class="link"></span><span class="link"></span><span class="link"></span><span class="link"></span><span class="link"></span></div>
+  <div class="msg" id="loader-msg">جارٍ تحميل الأحاديث...</div>
+</div>
+
+<div id="utility-bar"><div class="bar container">
+  <div class="date" id="topbar-date">—</div>
+  <div class="note" id="topbar-note">مصدر البيانات: fawazahmed0/hadith-api (Phase 1 — إثبات مفهوم)</div>
+</div></div>
+
+<header id="topnav"><div class="bar container">
+  <a href="#/" class="brand">
+    <span class="mark">۩</span>
+    <span class="txt"><b id="brand-title">موسوعة الحديث النبوي</b><span id="brand-sub">معرفة حديثية موثّقة</span></span>
+  </a>
+  <nav id="nav-links">
+    <a href="#/" data-r="/">الرئيسية</a>
+    <a href="#/books" data-r="/books">الكتب</a>
+    <a href="#/topics" data-r="/topics">الموضوعات</a>
+    <a href="#/search" data-r="/search">البحث</a>
+    <a href="#/sources" data-r="/sources">المصادر</a>
+  </nav>
+  <div class="nav-right">
+    <div class="lang-group" id="lang-switch">
+      <button data-lang="ar" class="active">ع</button>
+      <button data-lang="fr">FR</button>
+      <button data-lang="en">EN</button>
+    </div>
+    <button class="icon-btn" id="theme-toggle" aria-label="تبديل المظهر">◐</button>
+  </div>
+</div></header>
+
+<nav id="bottom-nav">
+  <a href="#/" class="bn-item" data-r="/"><span class="ic">⌂</span><span>الرئيسية</span></a>
+  <a href="#/search" class="bn-item" data-r="/search"><span class="ic">🔎</span><span>البحث</span></a>
+  <a href="#/books" class="bn-item" data-r="/books"><span class="ic">📖</span><span>الكتب</span></a>
+  <a href="#/favorites" class="bn-item" data-r="/favorites"><span class="ic">⭐</span><span>المفضلة</span></a>
+</nav>
+
+<main id="app"></main>
+
+<footer><div class="container">۩ موسوعة الحديث النبوي — Phase 1: الأساس والتصميم وطبقة الاتصال بالمصدر</div></footer>
+
+<script>
+/* =====================================================================
+   1) HADITH SOURCES ADAPTER LAYER
+   كل مصدر جديد = adapter مستقل يُنفّذ نفس الواجهة (interface) الموحّدة:
+     - listBooks()               → قائمة الكتب الموحّدة
+     - getBook(bookSlug)          → تفاصيل كتاب + عدد الأحاديث
+     - getHadith(bookSlug, num)   → حديث واحد بالـ Schema الداخلي
+     - getRandomHadith()          → لصفحة "حديث اليوم"
+   الواجهة (UI) لا تتحدث مباشرة مع أي API خارجي — فقط مع HadithService.
+   ===================================================================== */
+const CANONICAL_SCHEMA_NOTE = "كل حديث مُعاد بهذا الشكل: {source, book, hadithNumber, textAr, narrator, grade, gradeSource, isnad, sourceUrl}";
+
+// ---- Adapter #1: fawazahmed0/hadith-api (CDN JSON, بدون مفتاح) ----
+const FawazAdapter = (() => {
+  const BASE = "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1";
+  const SOURCE_META = { id:"fawazahmed0", name_ar:"fawazahmed0/hadith-api", name_fr:"fawazahmed0/hadith-api", name_en:"fawazahmed0/hadith-api", url:"https://github.com/fawazahmed0/hadith-api" };
+
+  async function fetchJson(path){
+    const res = await fetch(`${BASE}/${path}`);
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+  }
+
+  async function listEditions(){
+    // ملف تعريف كل الإصدارات (كتب × لغات)
+    return fetchJson("editions/editions.min.json");
+  }
+
+  function normalizeHadith(raw, bookSlug, editionInfo){
+    if(!raw) return null;
+    return {
+      source: SOURCE_META,
+      book: { slug: bookSlug, title_ar: editionInfo?.name || null },
+      hadithNumber: raw.hadithnumber ?? raw.number ?? null,
+      textAr: raw.text || raw.hadith_ar || null,
+      narrator: raw.narrator || null, // غالبًا غير متوفر في هذا المصدر — نعرضها "غير متوفر"
+      grade: raw.grades && raw.grades.length ? raw.grades.map(g=>({ grade:g.grade||null, gradedBy:g.graded_by||null })) : null,
+      isnad: null, // هذا المصدر لا يوفر سلسلة إسناد مفصّلة — Phase لاحقة تبحث عن مصدر يوفرها
+      sourceUrl: SOURCE_META.url
+    };
+  }
+
+  async function getEditionBooks(editionName){
+    return fetchJson(`editions/${editionName}.min.json`);
+  }
+
+  async function getRandomHadith(){
+    // نستخدم صحيح البخاري كطبعة افتراضية آمنة للتجربة الأولى
+    const edition = "ara-bukhari";
+    const data = await getEditionBooks(edition);
+    const list = data?.hadiths || [];
+    if(!list.length) return null;
+    const pick = list[Math.floor(Math.random()*list.length)];
+    return normalizeHadith(pick, "bukhari", { name: "صحيح البخاري" });
+  }
+
+  // ---- Phase 2: كتب متاحة بالعربية للبحث والتصفح ----
+  // قائمة يدوية مبدئية للكتب الأكثر شيوعًا (تُستبدل لاحقًا بقراءة ديناميكية كاملة من editions.min.json في Phase 3)
+  const AVAILABLE_BOOKS = [
+    { slug:"bukhari", edition:"ara-bukhari", title_ar:"صحيح البخاري" },
+    { slug:"muslim",  edition:"ara-muslim",  title_ar:"صحيح مسلم" },
+    { slug:"abudawud",edition:"ara-abudawud",title_ar:"سنن أبي داود" },
+    { slug:"tirmidhi",edition:"ara-tirmidhi",title_ar:"جامع الترمذي" },
+    { slug:"nasai",   edition:"ara-nasai",   title_ar:"سنن النسائي" },
+    { slug:"ibnmajah",edition:"ara-ibnmajah",title_ar:"سنن ابن ماجه" }
+  ];
+
+  const editionCache = {}; // { editionName: {hadiths, metadata} }
+  async function getCachedEdition(editionName){
+    if(editionCache[editionName]) return editionCache[editionName];
+    const data = await getEditionBooks(editionName);
+    editionCache[editionName] = data;
+    return data;
+  }
+
+  function listAvailableBooks(){ return AVAILABLE_BOOKS; }
+
+  async function searchInBook(bookSlug, { query, hadithNumber, grade } = {}){
+    const bookMeta = AVAILABLE_BOOKS.find(b=>b.slug===bookSlug);
+    if(!bookMeta) throw new Error("Unknown book: "+bookSlug);
+    const data = await getCachedEdition(bookMeta.edition);
+    let list = data?.hadiths || [];
+    if(hadithNumber){
+      list = list.filter(h => String(h.hadithnumber) === String(hadithNumber));
+    } else if(query){
+      const norm = s => (s||"").replace(/[إأآا]/g,"ا").replace(/[ىي]/g,"ي").replace(/ة/g,"ه").replace(/[\u064B-\u0652]/g,"");
+      const q = norm(query);
+      list = list.filter(h => norm(h.text).includes(q));
+    }
+    if(grade){
+      list = list.filter(h => (h.grades||[]).some(g => (g.grade||"").includes(grade)));
+    }
+    return list.map(h => normalizeHadith(h, bookSlug, bookMeta));
+  }
+
+  async function getHadithByNumber(bookSlug, number){
+    const bookMeta = AVAILABLE_BOOKS.find(b=>b.slug===bookSlug);
+    if(!bookMeta) return null;
+    const data = await getCachedEdition(bookMeta.edition);
+    const raw = (data?.hadiths||[]).find(h => String(h.hadithnumber) === String(number));
+    return raw ? normalizeHadith(raw, bookSlug, bookMeta) : null;
+  }
+
+  async function getBookInfo(bookSlug){
+    const bookMeta = AVAILABLE_BOOKS.find(b=>b.slug===bookSlug);
+    if(!bookMeta) return null;
+    const data = await getCachedEdition(bookMeta.edition);
+    const meta = data?.metadata || {};
+    return {
+      slug: bookSlug,
+      title_ar: bookMeta.title_ar,
+      author: meta.author || meta.name || null, // نعرض "غير متوفر" إن لم يوفرها المصدر
+      hadithCount: (data?.hadiths || []).length || null,
+      source: SOURCE_META
+    };
+  }
+
+  return { meta: SOURCE_META, listEditions, getRandomHadith, listAvailableBooks, searchInBook, getHadithByNumber, getBookInfo };
+})();
+
+// ---- HadithService: الواجهة الموحّدة التي تستعملها الصفحات فقط ----
+const HadithService = {
+  adapters: [FawazAdapter],
+  async getDailyHadith(){
+    for(const adapter of this.adapters){
+      try{ const h = await adapter.getRandomHadith(); if(h) return h; }
+      catch(e){ console.warn("adapter failed:", adapter.meta?.id, e); }
+    }
+    return null; // الواجهة تعرض "تعذر جلب البيانات حالياً" — لا نخترع بديلاً
+  },
+  listBooks(){ return FawazAdapter.listAvailableBooks(); },
+  async getBookInfo(slug){ return FawazAdapter.getBookInfo(slug); },
+  async search(bookSlug, params){ return FawazAdapter.searchInBook(bookSlug, params); },
+  async getHadith(bookSlug, number){ return FawazAdapter.getHadithByNumber(bookSlug, number); }
+};
+
+/* ---- Favorites (localStorage — لا يوجد backend في هذا المشروع) ---- */
+const Favorites = {
+  key: "hn_favorites",
+  all(){ try{ return JSON.parse(localStorage.getItem(this.key)||"[]"); }catch{ return []; } },
+  has(book, num){ return this.all().some(f=>f.book===book && String(f.num)===String(num)); },
+  toggle(book, num){
+    let list = this.all();
+    if(this.has(book,num)) list = list.filter(f=>!(f.book===book && String(f.num)===String(num)));
+    else list.push({ book, num, savedAt: Date.now() });
+    localStorage.setItem(this.key, JSON.stringify(list));
+    return this.has(book,num);
+  }
+};
+
+function showToast(msg){
+  let t = document.getElementById("hn-toast");
+  if(!t){ t = document.createElement("div"); t.id = "hn-toast"; t.className = "toast"; document.body.appendChild(t); }
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(()=> t.classList.remove("show"), 2200);
+}
+
+/* =====================================================================
+   1.5) AI Hadith Explanation Assistant
+   الواجهة لا تتصل بأي مزود AI مباشرة — فقط بطبقة Backend/Serverless
+   الخاصة بنا (لحماية مفتاح API). راجع README-AI-SETUP.md لإعداد الخادم.
+   ===================================================================== */
+
+// ⚠️ عدّل هذا بعد نشر الـ Serverless Function (Vercel) — مثال:
+// "https://your-project.vercel.app/api/explain-hadith"
+const AI_BACKEND_URL = ""; // فارغ = الميزة غير مُفعّلة بعد
+
+// getHadithContext(): طبقة تجريد بين الحديث المُطبّع من HadithService وواجهة الـ AI
+// لا تُغيّر أسماء الحقول الأصلية — فقط توحّدها لشكل واحد يُرسل للـ backend
+function getHadithContext(h){
+  return {
+    text: h.textAr || null,
+    narrator: h.narrator || null,
+    source: h.source?.name_ar || null,
+    book: h.book?.title_ar || null,
+    hadithNumber: h.hadithNumber ?? null,
+    grade: h.grade ? h.grade.map(g=>g.grade).filter(Boolean).join("، ") : null,
+    topic: null, // غير متوفر من المصدر الحالي — نُرسله null عمدًا، لا نخترعه
+    metadata: { sourceUrl: h.sourceUrl || null }
+  };
+}
+
+const AIExplainCache = new Map(); // كاش بالذاكرة فقط لهذه الجلسة — لا localStorage
+
+const AIPanel = {
+  ctrl: null, // AbortController للتوليد الجاري
+  currentHadithKey: null,
+  ctx: null,
+
+  isConfigured(){ return !!AI_BACKEND_URL; },
+
+  mount(h, bookSlug, num){
+    this.ctx = getHadithContext(h);
+    this.currentHadithKey = `${bookSlug}:${num}:${currentLang}`;
+    this._loadedOnce = false;
+  },
+
+  open(){
+    const panel = document.getElementById("ai-panel");
+    panel.classList.add("open");
+    if(!this._loadedOnce){
+      this._loadedOnce = true;
+      this.runExplain();
+    }
+  },
+  close(){ document.getElementById("ai-panel").classList.remove("open"); },
+
+  switchTab(tabId){
+    document.querySelectorAll(".ai-tab-btn").forEach(b=> b.classList.toggle("active", b.dataset.tab===tabId));
+    document.querySelectorAll(".ai-tab-panel").forEach(p=> p.classList.toggle("active", p.id === "ai-tab-"+tabId));
+  },
+
+  setStatus(mode){ // "idle" | "loading" | "error"
+    const row = document.getElementById("ai-status-row");
+    if(mode==="loading"){
+      row.innerHTML = `<span class="ai-typing"><span></span><span></span><span></span></span> <span class="disabled-note">${T("aiGenerating")}</span> <button class="ai-stop-btn" id="ai-stop-btn">${T("aiStop")}</button>`;
+      document.getElementById("ai-stop-btn").addEventListener("click", ()=> this.stop());
+    } else if(mode==="error"){
+      row.innerHTML = `<span style="color:var(--grade-daif);font-size:12.5px;">${T("aiError")}</span> <button class="ai-retry-btn" id="ai-retry-btn">${T("aiRetry")}</button>`;
+      document.getElementById("ai-retry-btn").addEventListener("click", ()=> this.runExplain(true));
+    } else {
+      row.innerHTML = "";
+    }
+  },
+
+  stop(){ if(this.ctrl){ this.ctrl.abort(); this.setStatus("idle"); } },
+
+  async runExplain(forceRefresh){
+    if(!this.isConfigured()){
+      document.getElementById("ai-tab-panels").innerHTML = `<div class="ai-not-configured">⚙️ ${T("aiNotConfigured")}</div>`;
+      return;
+    }
+    if(!this.ctx.text){
+      document.getElementById("ai-tab-panels").innerHTML = `<div class="ai-not-configured">${T("aiInsufficientData")}</div>`;
+      return;
+    }
+    const cacheKey = this.currentHadithKey;
+    if(!forceRefresh && AIExplainCache.has(cacheKey)){
+      this.renderSections(AIExplainCache.get(cacheKey));
+      this.setStatus("idle");
+      return;
+    }
+
+    document.getElementById("ai-tab-meaning").innerHTML = "";
+    document.getElementById("ai-tab-words").innerHTML = "";
+    document.getElementById("ai-tab-detail").innerHTML = "";
+    document.getElementById("ai-tab-benefits").innerHTML = "";
+    this.setStatus("loading");
+
+    this.ctrl = new AbortController();
+    let full = "";
+    try{
+      const res = await fetch(AI_BACKEND_URL, {
+        method: "POST",
+        headers: { "content-type":"application/json" },
+        signal: this.ctrl.signal,
+        body: JSON.stringify({ mode:"explain", hadith:this.ctx, lang:currentLang })
+      });
+      if(!res.ok || !res.body) throw new Error("upstream_error");
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      while(true){
+        const { done, value } = await reader.read();
+        if(done) break;
+        full += decoder.decode(value, { stream:true });
+        this.renderSections(full, true);
+      }
+      AIExplainCache.set(cacheKey, full);
+      this.setStatus("idle");
+    }catch(e){
+      if(e.name === "AbortError"){ this.setStatus("idle"); return; }
+      console.error(e);
+      this.setStatus("error");
+    }
+  },
+
+  parseSections(full){
+    const markers = ["%%MEANING%%","%%WORDS%%","%%DETAIL%%","%%BENEFITS%%"];
+    const out = { MEANING:"", WORDS:"", DETAIL:"", BENEFITS:"" };
+    let rest = full;
+    for(let i=0;i<markers.length;i++){
+      const idx = rest.indexOf(markers[i]);
+      if(idx === -1) continue;
+      const after = rest.slice(idx + markers[i].length);
+      const nextIdx = markers.slice(i+1).map(m=>after.indexOf(m)).filter(x=>x!==-1).sort((a,b)=>a-b)[0];
+      const key = markers[i].replace(/%/g,"");
+      out[key] = nextIdx!==undefined ? after.slice(0,nextIdx) : after;
+    }
+    return out;
+  },
+
+  mdToHtml(s){
+    return esc(s.trim())
+      .replace(/\n{2,}/g,"</p><p>")
+      .replace(/\n/g,"<br>")
+      .replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>")
+      .replace(/^-\s+/gm,"• ");
+  },
+
+  renderSections(full){
+    const sec = this.parseSections(full);
+    if(sec.MEANING) document.getElementById("ai-tab-meaning").innerHTML = `<p>${this.mdToHtml(sec.MEANING)}</p>`;
+    if(sec.WORDS) document.getElementById("ai-tab-words").innerHTML = `<div>${this.mdToHtml(sec.WORDS)}</div>`;
+    if(sec.DETAIL) document.getElementById("ai-tab-detail").innerHTML = `<p>${this.mdToHtml(sec.DETAIL)}</p>`;
+    if(sec.BENEFITS) document.getElementById("ai-tab-benefits").innerHTML = `<div>${this.mdToHtml(sec.BENEFITS)}</div>`;
+  },
+
+  async ask(){
+    const input = document.getElementById("ai-ask-input");
+    const q = input.value.trim();
+    if(!q) return;
+    if(!this.isConfigured()){ showToast(T("aiNotConfigured")); return; }
+    input.value = "";
+    const list = document.getElementById("ai-qa-list");
+    const qaId = "qa-"+Date.now();
+    list.insertAdjacentHTML("beforeend", `
+      <div class="ai-qa-item">
+        <div class="ai-qa-q">🙋 ${esc(q)}</div>
+        <div class="ai-qa-a" id="${qaId}"><span class="ai-typing"><span></span><span></span><span></span></span></div>
+      </div>
+    `);
+    const answerSlot = document.getElementById(qaId);
+    const ctrl = new AbortController();
+    try{
+      const res = await fetch(AI_BACKEND_URL, {
+        method:"POST", headers:{"content-type":"application/json"}, signal: ctrl.signal,
+        body: JSON.stringify({ mode:"ask", hadith:this.ctx, lang:currentLang, question:q })
+      });
+      if(!res.ok || !res.body) throw new Error("upstream_error");
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let acc = "";
+      answerSlot.innerHTML = "";
+      while(true){
+        const { done, value } = await reader.read();
+        if(done) break;
+        acc += decoder.decode(value, { stream:true });
+        answerSlot.innerHTML = this.mdToHtml(acc);
+      }
+    }catch(e){
+      console.error(e);
+      answerSlot.innerHTML = `<span style="color:var(--grade-daif)">${T("aiError")}</span>`;
+    }
+  }
+};
+
+/* =====================================================================
+   2) i18n — واجهة فقط (نص الحديث نفسه يبقى كما ورد من المصدر)
+   ===================================================================== */
+const DICT = {
+  ar:{ home:"الرئيسية", books:"الكتب", search:"البحث", sources:"المصادر", favorites:"المفضلة",
+       heroTitle:"موسوعة الحديث النبوي", heroLead:"اكتشف الأحاديث، رواياتها، مصادرها ورجالها في مكان واحد.",
+       searchPh:"ابحث في الأحاديث النبوية...", hadithOfDay:"حديث اليوم", exploreBooks:"استكشف الكتب",
+       loading:"جارٍ تحميل الأحاديث...", noResults:"لم نجد نتائج مطابقة.", apiError:"تعذر جلب البيانات حالياً.",
+       na:"غير متوفر", narrator:"الراوي", source:"المصدر", book:"الكتاب", grade:"الدرجة", comingSoon:"قيد الإنشاء — هذه الصفحة ضمن المرحلة القادمة.",
+       trust:"مصدر هذا الحديث:",
+       chooseBook:"اختر الكتاب", queryLabel:"نص أو كلمة", hadithNumberLabel:"رقم الحديث", gradeLabel:"الدرجة",
+       allGrades:"كل الدرجات", searchBtn:"بحث", resetBtn:"إعادة تعيين", loadMore:"عرض المزيد",
+       resultsFound:"نتيجة", chooseBookFirst:"اختر كتابًا أولًا للبحث فيه.", filterSoon:"قريبًا",
+       copy:"نسخ", share:"مشاركة", save:"حفظ", saved:"محفوظ", openSource:"فتح المصدر", print:"طباعة",
+       isnadNote:"هذا المصدر لا يوفّر سلسلة إسناد مفصّلة حاليًا — سيُضاف عند دمج مصدر يوفّرها.",
+       hadithNumberCol:"رقم", copied:"تم نسخ النص", savedMsg:"أُضيف إلى المفضلة", unsavedMsg:"أُزيل من المفضلة",
+       notFoundHadith:"لم يُعثر على هذا الحديث.", searching:"جارٍ البحث...",
+       topics:"الموضوعات", sources:"المصادر", author:"المؤلف", hadithCount:"عدد الأحاديث",
+       booksInSource:"الكتب المتوفرة", dataMethod:"طريقة الحصول على البيانات", originalSource:"المصدر الأصلي",
+       apiStaticFiles:"ملفات JSON ثابتة تُجلب مباشرة من الواجهة عبر شبكة CDN — بدون خادم أو قاعدة بيانات خاصة بنا.",
+       approxTopicSearch:"نتائج تقريبية لكلمة", approxTopicNote:"بحث نصي داخل الكتاب المختار — وليس تصنيفًا رسميًا من المصدر.",
+       topicPickBook:"اختر كتابًا للبحث فيه عن هذا الموضوع.",
+       narratorTitle:"صفحة الراوي", narratorUnavailable:"بيانات الرواة المنظّمة (الطبقة، سنة الوفاة، قائمة الأحاديث) غير متوفرة من المصدر الحالي. لن نعرض معلومات غير موثوقة — ستُفعَّل هذه الصفحة عند دمج مصدر يوفر بيانات إسناد ورواة مفصّلة.",
+       searchInBook:"بحث داخل الكتاب", viewHadith:"عرض الحديث", loadingBooks:"جارٍ تحميل الكتب...",
+       browseBook:"تصفح الكتاب",
+       aiExplainBtn:"شرح الحديث بالذكاء الاصطناعي", aiDisclaimer:"هذا الشرح للمساعدة على الفهم، ولا يُعد بديلاً عن الرجوع إلى كتب شروح الحديث وأهل العلم.",
+       aiTabMeaning:"المعنى العام", aiTabWords:"شرح الكلمات", aiTabDetail:"الشرح التفصيلي", aiTabBenefits:"أهم الفوائد", aiTabScholars:"شروح العلماء", aiTabAsk:"اسأل عن الحديث",
+       aiGenerating:"جارٍ توليد الشرح...", aiStop:"إيقاف", aiRetry:"إعادة المحاولة", aiError:"تعذر إنشاء الشرح حالياً. حاول مرة أخرى.",
+       aiScholarsUnavailable:"لم يتم العثور على مصدر موثوق لهذه المعلومة. لا تتوفر حاليًا لدى هذا النظام قاعدة شروح موثوقة مرتبطة (RAG) — سيُفعَّل هذا القسم عند دمج مصادر شروح معتمدة.",
+       aiNotConfigured:"لم يتم إعداد الخادم الخلفي لميزة الذكاء الاصطناعي بعد. راجع ملف الإعداد (README-AI-SETUP.md).",
+       aiAskPh:"اكتب سؤالك عن هذا الحديث...", aiAskSend:"إرسال", aiOffTopic:"هذا المساعد متخصص فقط في شرح الأحاديث النبوية — يرجى طرح سؤال متعلق بهذا الحديث.",
+       aiInsufficientData:"البيانات المتوفرة لهذا الحديث غير كافية لإعطاء شرح موثوق." },
+  fr:{ home:"Accueil", books:"Livres", search:"Recherche", sources:"Sources", favorites:"Favoris",
+       heroTitle:"Encyclopédie du Hadith", heroLead:"Découvrez les hadiths, leurs versions, sources et narrateurs en un seul endroit.",
+       searchPh:"Rechercher un hadith...", hadithOfDay:"Hadith du jour", exploreBooks:"Explorer les livres",
+       loading:"Chargement...", noResults:"Aucun résultat.", apiError:"Impossible de récupérer les données pour le moment.",
+       na:"Non disponible", narrator:"Narrateur", source:"Source", book:"Livre", grade:"Degré", comingSoon:"En construction — disponible dans une prochaine phase.",
+       trust:"Source de ce hadith :",
+       chooseBook:"Choisir un livre", queryLabel:"Mot ou texte", hadithNumberLabel:"N° du hadith", gradeLabel:"Degré",
+       allGrades:"Tous les degrés", searchBtn:"Rechercher", resetBtn:"Réinitialiser", loadMore:"Voir plus",
+       resultsFound:"résultat(s)", chooseBookFirst:"Choisissez d'abord un livre.", filterSoon:"Bientôt",
+       copy:"Copier", share:"Partager", save:"Enregistrer", saved:"Enregistré", openSource:"Voir la source", print:"Imprimer",
+       isnadNote:"Cette source ne fournit pas encore de chaîne de transmission détaillée — ajoutée avec une future source.",
+       hadithNumberCol:"N°", copied:"Texte copié", savedMsg:"Ajouté aux favoris", unsavedMsg:"Retiré des favoris",
+       notFoundHadith:"Hadith introuvable.", searching:"Recherche...",
+       topics:"Thèmes", sources:"Sources", author:"Auteur", hadithCount:"Nombre de hadiths",
+       booksInSource:"Livres disponibles", dataMethod:"Méthode d'obtention des données", originalSource:"Source originale",
+       apiStaticFiles:"Fichiers JSON statiques récupérés directement par le navigateur via un CDN — sans serveur ni base de données propre.",
+       approxTopicSearch:"Résultats approximatifs pour", approxTopicNote:"Recherche textuelle dans le livre choisi — pas une classification officielle de la source.",
+       topicPickBook:"Choisissez un livre pour rechercher ce thème.",
+       narratorTitle:"Page du narrateur", narratorUnavailable:"Les données structurées des narrateurs (génération, année de décès, liste des hadiths) ne sont pas disponibles depuis la source actuelle. Nous n'afficherons pas d'informations non fiables — cette page sera activée avec une source fournissant isnad et narrateurs détaillés.",
+       searchInBook:"Rechercher dans ce livre", viewHadith:"Voir le hadith", loadingBooks:"Chargement des livres...",
+       browseBook:"Parcourir",
+       aiExplainBtn:"Expliquer avec l'IA", aiDisclaimer:"Cette explication aide à la compréhension et ne remplace pas les livres de commentaire (شروح) et les savants.",
+       aiTabMeaning:"Sens général", aiTabWords:"Mots expliqués", aiTabDetail:"Explication détaillée", aiTabBenefits:"Bienfaits principaux", aiTabScholars:"Commentaires des savants", aiTabAsk:"Poser une question",
+       aiGenerating:"Génération de l'explication...", aiStop:"Arrêter", aiRetry:"Réessayer", aiError:"Impossible de générer l'explication. Réessayez.",
+       aiScholarsUnavailable:"Aucune source fiable trouvée pour cette information. Ce système ne dispose pas encore d'une base de commentaires vérifiée (RAG) — cette section sera activée avec des sources approuvées.",
+       aiNotConfigured:"Le backend de la fonctionnalité IA n'est pas encore configuré. Voir README-AI-SETUP.md.",
+       aiAskPh:"Posez votre question sur ce hadith...", aiAskSend:"Envoyer", aiOffTopic:"Cet assistant est spécialisé uniquement dans l'explication des hadiths — posez une question liée à ce hadith.",
+       aiInsufficientData:"Les données disponibles pour ce hadith sont insuffisantes pour une explication fiable." },
+  en:{ home:"Home", books:"Books", search:"Search", sources:"Sources", favorites:"Favorites",
+       heroTitle:"Hadith Encyclopedia", heroLead:"Discover hadiths, their versions, sources and narrators in one place.",
+       searchPh:"Search hadiths...", hadithOfDay:"Hadith of the Day", exploreBooks:"Explore Books",
+       loading:"Loading...", noResults:"No results found.", apiError:"Could not fetch data right now.",
+       na:"Not available", narrator:"Narrator", source:"Source", book:"Book", grade:"Grade", comingSoon:"Coming soon in the next phase.",
+       trust:"Source of this hadith:",
+       chooseBook:"Choose a book", queryLabel:"Word or text", hadithNumberLabel:"Hadith number", gradeLabel:"Grade",
+       allGrades:"All grades", searchBtn:"Search", resetBtn:"Reset", loadMore:"Load more",
+       resultsFound:"result(s)", chooseBookFirst:"Choose a book first.", filterSoon:"Coming soon",
+       copy:"Copy", share:"Share", save:"Save", saved:"Saved", openSource:"Open source", print:"Print",
+       isnadNote:"This source does not yet provide a detailed isnad chain — will be added with a future source.",
+       hadithNumberCol:"No.", copied:"Text copied", savedMsg:"Added to favorites", unsavedMsg:"Removed from favorites",
+       notFoundHadith:"Hadith not found.", searching:"Searching...",
+       topics:"Topics", sources:"Sources", author:"Author", hadithCount:"Hadith count",
+       booksInSource:"Available books", dataMethod:"Data acquisition method", originalSource:"Original source",
+       apiStaticFiles:"Static JSON files fetched directly by the browser via a CDN — no server or database of our own.",
+       approxTopicSearch:"Approximate results for", approxTopicNote:"Text search within the chosen book — not an official classification from the source.",
+       topicPickBook:"Choose a book to search this topic in.",
+       narratorTitle:"Narrator page", narratorUnavailable:"Structured narrator data (generation, death year, hadith list) is not available from the current source. We won't display unreliable information — this page will be enabled once a source with detailed isnad and narrators is integrated.",
+       searchInBook:"Search within this book", viewHadith:"View hadith", loadingBooks:"Loading books...",
+       browseBook:"Browse",
+       aiExplainBtn:"Explain with AI", aiDisclaimer:"This explanation aids understanding and is not a substitute for hadith commentary books and qualified scholars.",
+       aiTabMeaning:"General meaning", aiTabWords:"Word explanations", aiTabDetail:"Detailed explanation", aiTabBenefits:"Key benefits", aiTabScholars:"Scholarly commentary", aiTabAsk:"Ask about this hadith",
+       aiGenerating:"Generating explanation...", aiStop:"Stop", aiRetry:"Retry", aiError:"Could not generate the explanation. Please try again.",
+       aiScholarsUnavailable:"No reliable source found for this information. This system does not yet have a verified commentary database (RAG) — this section will be enabled once approved sources are integrated.",
+       aiNotConfigured:"The AI feature's backend is not configured yet. See README-AI-SETUP.md.",
+       aiAskPh:"Ask a question about this hadith...", aiAskSend:"Send", aiOffTopic:"This assistant is specialized only in explaining hadith — please ask a question related to this hadith.",
+       aiInsufficientData:"The available data for this hadith is insufficient for a reliable explanation." }
+};
+let currentLang = localStorage.getItem("hn_lang") || "ar";
+function T(key){ return DICT[currentLang]?.[key] ?? DICT.ar[key] ?? key; }
+
+function applyLangChrome(){
+  document.documentElement.lang = currentLang;
+  document.documentElement.dir = currentLang === "ar" ? "rtl" : "ltr";
+  document.querySelectorAll("#nav-links a")[0].textContent = T("home");
+  document.querySelectorAll("#nav-links a")[1].textContent = T("books");
+  document.querySelectorAll("#nav-links a")[2].textContent = T("topics");
+  document.querySelectorAll("#nav-links a")[3].textContent = T("search");
+  document.querySelectorAll("#nav-links a")[4].textContent = T("sources");
+  document.querySelectorAll("#lang-switch button").forEach(b=> b.classList.toggle("active", b.dataset.lang===currentLang));
+}
+
+/* =====================================================================
+   3) Theme
+   ===================================================================== */
+function applyTheme(t){
+  document.documentElement.setAttribute("data-theme", t);
+  localStorage.setItem("hn_theme", t);
+  document.getElementById("theme-toggle").textContent = t === "dark" ? "◐" : "◑";
+}
+function initTheme(){
+  applyTheme(localStorage.getItem("hn_theme") || "dark");
+}
+document.getElementById("theme-toggle").addEventListener("click", ()=>{
+  applyTheme(document.documentElement.getAttribute("data-theme")==="dark" ? "light" : "dark");
+});
+document.getElementById("lang-switch").addEventListener("click", (e)=>{
+  const btn = e.target.closest("button[data-lang]");
+  if(!btn) return;
+  currentLang = btn.dataset.lang;
+  localStorage.setItem("hn_lang", currentLang);
+  applyLangChrome();
+  router();
+});
+
+/* =====================================================================
+   4) UI helpers (loading / empty / error) — نفس فلسفة الموسوعة التاريخية
+   ===================================================================== */
+function loadingBlock(){ return `<div class="loading">${T("loading")}</div>`; }
+function emptyBlock(msg){ return `<div class="empty">${msg}</div>`; }
+function errorBlock(){ return `<div class="error-state">${T("apiError")}</div>`; }
+function naSpan(){ return `<span class="na">${T("na")}</span>`; }
+function esc(s){ return (s??"").toString().replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+function gradeToPill(gradeArr){
+  if(!gradeArr || !gradeArr.length) return `<span class="grade-pill unknown">${T("grade")}: ${T("na")}</span>`;
+  return gradeArr.map(g=>{
+    const label = g.grade || T("na");
+    const cls = /صحيح|sahih/i.test(label) ? "sahih" : /حسن|hasan/i.test(label) ? "hasan" : /ضعيف|da.?if/i.test(label) ? "daif" : "unknown";
+    return `<span class="grade-pill ${cls}">${esc(label)}${g.gradedBy? " — "+esc(g.gradedBy):""}</span>`;
+  }).join(" ");
+}
+
+/* =====================================================================
+   5) Router + Pages
+   ===================================================================== */
+const app = document.getElementById("app");
+
+async function renderHome(){
+  app.innerHTML = `
+    <section class="hero">
+      <div class="hero-inner container">
+        <span class="eyebrow">${T("hadithOfDay")}</span>
+        <h1>${T("heroTitle")}</h1>
+        <p>${T("heroLead")}</p>
+        <div class="search-shell">
+          <div class="search-box">
+            <input type="text" placeholder="${T("searchPh")}" id="home-search-input">
+            <button class="go" aria-label="${T("search")}">🔎</button>
+          </div>
+        </div>
+        <div class="quicknav">
+          <a href="#/books">📖 ${T("books")}</a>
+          <a href="#/topics">🏷️ ${T("topics")}</a>
+          <a href="#/search">🔎 ${T("search")}</a>
+          <a href="#/sources">📚 ${T("sources")}</a>
+          <a href="#/favorites">⭐ ${T("favorites")}</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section container">
+      <div class="section-head">
+        <div>
+          <div class="kicker">${T("hadithOfDay")}</div>
+        </div>
+      </div>
+      <div id="daily-hadith">${loadingBlock()}</div>
+    </section>
+  `;
+
+  const goToSearch = ()=>{
+    const q = document.getElementById("home-search-input").value.trim();
+    if(q) sessionStorage.setItem("hn_prefill_query", q);
+    location.hash = "#/search";
+  };
+  document.querySelector(".search-box .go").addEventListener("click", goToSearch);
+  document.getElementById("home-search-input").addEventListener("keydown", e=>{ if(e.key==="Enter") goToSearch(); });
+
+  const slot = document.getElementById("daily-hadith");
+  try{
+    const h = await HadithService.getDailyHadith();
+    if(!h){ slot.innerHTML = errorBlock(); return; }
+    slot.innerHTML = `
+      <div class="hadith-card reveal in-view">
+        <p class="hadith-text">${h.textAr ? esc(h.textAr) : naSpan()}</p>
+        <div class="hadith-meta">
+          <div><b>${T("narrator")}:</b> ${h.narrator ? esc(h.narrator) : naSpan()}</div>
+          <div><b>${T("book")}:</b> ${h.book?.title_ar ? esc(h.book.title_ar) : naSpan()}</div>
+          <div>${gradeToPill(h.grade)}</div>
+        </div>
+      </div>
+      <div class="trust-strip">
+        <span>ℹ️</span>
+        <span>${T("trust")} <b>${esc(h.source.name_ar)}</b> — <a href="${h.sourceUrl}" target="_blank" rel="noopener">${h.sourceUrl}</a></span>
+      </div>
+    `;
+  }catch(e){
+    console.error(e);
+    slot.innerHTML = errorBlock();
+  }
+}
+
+function renderComingSoon(title){
+  app.innerHTML = `
+    <section class="section container" style="padding-top:70px;">
+      <div class="section-head"><h2>${title}</h2></div>
+      <div class="empty">${T("comingSoon")}</div>
+    </section>
+  `;
+}
+
+/* ---------- /search ---------- */
+let searchResultsFull = []; // القائمة الكاملة قبل التقطيع (pagination)
+let searchShown = 0;
+const PAGE_SIZE = 8;
+
+function renderSearch(prefill){
+  const books = HadithService.listBooks();
+  const topicHint = sessionStorage.getItem("hn_topic_hint");
+  if(topicHint) sessionStorage.removeItem("hn_topic_hint");
+  app.innerHTML = `
+    <section class="search-page-head container">
+      <div class="section-head"><h2>${T("search")}</h2></div>
+      ${topicHint ? `<div class="topic-banner">🏷️ <span>${T("approxTopicSearch")} «${esc(topicHint)}» — ${T("approxTopicNote")}</span></div>` : ""}
+      <div class="filters">
+        <div>
+          <label>${T("chooseBook")}</label>
+          <select id="f-book">
+            <option value="">—</option>
+            ${books.map(b=>`<option value="${b.slug}" ${prefill?.book===b.slug?"selected":""}>${esc(b.title_ar)}</option>`).join("")}
+          </select>
+        </div>
+        <div>
+          <label>${T("queryLabel")}</label>
+          <input type="text" id="f-query" placeholder="..." value="${prefill?.query?esc(prefill.query):''}">
+        </div>
+        <div>
+          <label>${T("hadithNumberLabel")}</label>
+          <input type="text" id="f-num" inputmode="numeric" placeholder="#" value="${prefill?.num?esc(prefill.num):''}">
+        </div>
+        <div>
+          <label>${T("gradeLabel")}</label>
+          <select id="f-grade">
+            <option value="">${T("allGrades")}</option>
+            <option value="صحيح">${T("na")==="غير متوفر"?"صحيح":"Ṣaḥīḥ"}</option>
+            <option value="حسن">${T("na")==="غير متوفر"?"حسن":"Ḥasan"}</option>
+            <option value="ضعيف">${T("na")==="غير متوفر"?"ضعيف":"Ḍa‘īf"}</option>
+          </select>
+        </div>
+        <div>
+          <label>${T("narrator")} <span class="disabled-note">(${T("filterSoon")})</span></label>
+          <select disabled><option>—</option></select>
+        </div>
+      </div>
+      <div class="search-btn-row">
+        <button class="btn btn-primary" id="do-search">${T("searchBtn")}</button>
+        <button class="btn btn-outline" id="reset-search">${T("resetBtn")}</button>
+      </div>
+    </section>
+    <section class="section container">
+      <div id="search-results"></div>
+    </section>
+  `;
+
+  document.getElementById("do-search").addEventListener("click", runSearch);
+  document.getElementById("reset-search").addEventListener("click", ()=>{
+    document.getElementById("f-book").value = "";
+    document.getElementById("f-query").value = "";
+    document.getElementById("f-num").value = "";
+    document.getElementById("f-grade").value = "";
+    document.getElementById("search-results").innerHTML = "";
+  });
+  ["f-query","f-num"].forEach(id=>{
+    document.getElementById(id).addEventListener("keydown", e=>{ if(e.key==="Enter") runSearch(); });
+  });
+
+  if(prefill?.book) runSearch();
+}
+
+async function runSearch(){
+  const book = document.getElementById("f-book").value;
+  const query = document.getElementById("f-query").value.trim();
+  const num = document.getElementById("f-num").value.trim();
+  const grade = document.getElementById("f-grade").value;
+  const slot = document.getElementById("search-results");
+
+  if(!book){ slot.innerHTML = emptyBlock(T("chooseBookFirst")); return; }
+  slot.innerHTML = loadingBlock();
+
+  try{
+    const results = await HadithService.search(book, { query, hadithNumber: num, grade });
+    searchResultsFull = results;
+    searchShown = 0;
+    renderSearchPage(book);
+  }catch(e){
+    console.error(e);
+    slot.innerHTML = errorBlock();
+  }
+}
+
+function renderSearchPage(book){
+  const slot = document.getElementById("search-results");
+  const nextBatch = searchResultsFull.slice(0, searchShown + PAGE_SIZE);
+  searchShown = nextBatch.length;
+
+  if(!searchResultsFull.length){
+    slot.innerHTML = emptyBlock(T("noResults"));
+    return;
+  }
+
+  slot.innerHTML = `
+    <div class="disabled-note" style="margin-bottom:12px;">${searchResultsFull.length} ${T("resultsFound")}</div>
+    <div id="results-list">
+      ${nextBatch.map(h=>`
+        <a class="result-card" href="#/hadith/${h.book.slug}/${h.hadithNumber}">
+          <p class="rtext">${h.textAr ? esc(h.textAr.slice(0,220)) + (h.textAr.length>220?"…":"") : naSpan()}</p>
+          <div class="rmeta">
+            <span>${T("book")}: ${esc(h.book.title_ar||"")}</span>
+            <span>${T("hadithNumberCol")}: ${h.hadithNumber ?? T("na")}</span>
+            ${gradeToPill(h.grade)}
+          </div>
+        </a>
+      `).join("")}
+    </div>
+    ${searchShown < searchResultsFull.length ? `<div class="load-more-wrap"><button class="btn btn-outline" id="load-more-btn">${T("loadMore")}</button></div>` : ""}
+  `;
+  const btn = document.getElementById("load-more-btn");
+  if(btn) btn.addEventListener("click", ()=> renderSearchPage(book));
+}
+
+/* ---------- /hadith/:book/:num ---------- */
+async function renderHadithDetail(bookSlug, num){
+  app.innerHTML = `
+    <section class="section container" style="padding-top:36px;">
+      <div class="breadcrumbs">
+        <a href="#/">${T("home")}</a><span class="sep">/</span>
+        <a href="#/search">${T("search")}</a><span class="sep">/</span>
+        <span>${esc(bookSlug)} #${esc(num)}</span>
+      </div>
+      <div id="detail-slot">${loadingBlock()}</div>
+    </section>
+  `;
+  const slot = document.getElementById("detail-slot");
+  try{
+    const h = await HadithService.getHadith(bookSlug, num);
+    if(!h){ slot.innerHTML = emptyBlock(T("notFoundHadith")); return; }
+    const isFav = Favorites.has(bookSlug, num);
+    slot.innerHTML = `
+      <div class="detail-card">
+        <p class="hadith-text">${h.textAr ? esc(h.textAr) : naSpan()}</p>
+        <div class="info-grid">
+          <div class="info-item"><div class="lbl">${T("narrator")}</div><div class="val">${h.narrator?esc(h.narrator):naSpan()}</div></div>
+          <div class="info-item"><div class="lbl">${T("source")}</div><div class="val">${esc(h.source.name_ar)}</div></div>
+          <div class="info-item"><div class="lbl">${T("book")}</div><div class="val">${esc(h.book.title_ar||"")}</div></div>
+          <div class="info-item"><div class="lbl">${T("hadithNumberLabel")}</div><div class="val">${h.hadithNumber ?? T("na")}</div></div>
+          <div class="info-item"><div class="lbl">${T("grade")}</div><div class="val">${gradeToPill(h.grade)}</div></div>
+        </div>
+        <div class="isnad-box">🔗 ${T("isnadNote")}</div>
+        <div class="actions-row">
+          <button class="ai-explain-btn" id="ai-open-btn">✨ ${T("aiExplainBtn")}</button>
+          <button class="action-btn" id="act-copy">📋 ${T("copy")}</button>
+          <button class="action-btn" id="act-share">🔗 ${T("share")}</button>
+          <button class="action-btn ${isFav?'saved':''}" id="act-save">⭐ <span id="save-label">${isFav?T("saved"):T("save")}</span></button>
+          <a class="action-btn" href="${h.sourceUrl}" target="_blank" rel="noopener">↗ ${T("openSource")}</a>
+          <button class="action-btn" id="act-print">🖨 ${T("print")}</button>
+        </div>
+
+        <div class="ai-panel" id="ai-panel">
+          <div class="ai-panel-head">
+            <div class="ttl">✨ ${T("aiExplainBtn")}</div>
+            <button class="ai-panel-close" id="ai-close-btn">✕</button>
+          </div>
+          <div class="ai-disclaimer">ℹ️ ${T("aiDisclaimer")}</div>
+          <div class="ai-tabs">
+            <button class="ai-tab-btn active" data-tab="meaning">${T("aiTabMeaning")}</button>
+            <button class="ai-tab-btn" data-tab="words">${T("aiTabWords")}</button>
+            <button class="ai-tab-btn" data-tab="detail">${T("aiTabDetail")}</button>
+            <button class="ai-tab-btn" data-tab="benefits">${T("aiTabBenefits")}</button>
+            <button class="ai-tab-btn" data-tab="scholars">${T("aiTabScholars")}</button>
+            <button class="ai-tab-btn" data-tab="ask">${T("aiTabAsk")}</button>
+          </div>
+          <div class="ai-status-row" id="ai-status-row"></div>
+          <div id="ai-tab-panels" class="ai-tab-panels">
+            <div class="ai-tab-panel active" id="ai-tab-meaning"></div>
+            <div class="ai-tab-panel" id="ai-tab-words"></div>
+            <div class="ai-tab-panel" id="ai-tab-detail"></div>
+            <div class="ai-tab-panel" id="ai-tab-benefits"></div>
+            <div class="ai-tab-panel" id="ai-tab-scholars"><div class="scholars-unavailable">📚 <span>${T("aiScholarsUnavailable")}</span></div></div>
+            <div class="ai-tab-panel" id="ai-tab-ask">
+              <div class="ai-ask-form">
+                <input type="text" id="ai-ask-input" placeholder="${T("aiAskPh")}">
+                <button class="btn btn-primary" id="ai-ask-send">${T("aiAskSend")}</button>
+              </div>
+              <div id="ai-qa-list"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    document.getElementById("act-copy").addEventListener("click", ()=>{
+      navigator.clipboard?.writeText(h.textAr||"").then(()=> showToast(T("copied")));
+    });
+    document.getElementById("act-share").addEventListener("click", async ()=>{
+      const url = location.href;
+      if(navigator.share){ try{ await navigator.share({ title: T("heroTitle"), text: h.textAr||"", url }); }catch(e){} }
+      else { navigator.clipboard?.writeText(url).then(()=> showToast(T("copied"))); }
+    });
+    document.getElementById("act-save").addEventListener("click", (e)=>{
+      const nowFav = Favorites.toggle(bookSlug, num);
+      e.currentTarget.classList.toggle("saved", nowFav);
+      document.getElementById("save-label").textContent = nowFav ? T("saved") : T("save");
+      showToast(nowFav ? T("savedMsg") : T("unsavedMsg"));
+    });
+    document.getElementById("act-print").addEventListener("click", ()=> window.print());
+
+    // --- AI panel wiring ---
+    AIPanel.mount(h, bookSlug, num);
+    document.getElementById("ai-open-btn").addEventListener("click", ()=> AIPanel.open());
+    document.getElementById("ai-close-btn").addEventListener("click", ()=> AIPanel.close());
+    document.querySelectorAll(".ai-tab-btn").forEach(btn=>{
+      btn.addEventListener("click", ()=> AIPanel.switchTab(btn.dataset.tab));
+    });
+    document.getElementById("ai-ask-send").addEventListener("click", ()=> AIPanel.ask());
+    document.getElementById("ai-ask-input").addEventListener("keydown", e=>{ if(e.key==="Enter") AIPanel.ask(); });
+  }catch(e){
+    console.error(e);
+    slot.innerHTML = errorBlock();
+  }
+}
+
+/* ---------- /books ---------- */
+function renderBooks(){
+  const books = HadithService.listBooks();
+  app.innerHTML = `
+    <section class="section container" style="padding-top:40px;">
+      <div class="section-head"><h2>${T("books")}</h2></div>
+      <div class="grid" id="books-grid">
+        ${books.map(b=>`
+          <a class="book-card linkish" href="#/book/${b.slug}" data-slug="${b.slug}">
+            <div class="bnum">${esc(b.title_ar)}</div>
+            <h4>${esc(b.title_ar)}</h4>
+            <div class="meta count-slot"><div class="skeleton count-skel"></div></div>
+          </a>
+        `).join("")}
+      </div>
+    </section>
+  `;
+  // تحميل تدريجي للعدد الفعلي لكل كتاب (بدون حجب الواجهة)
+  books.forEach(async b=>{
+    const card = document.querySelector(`.book-card[data-slug="${b.slug}"] .count-slot`);
+    try{
+      const info = await HadithService.getBookInfo(b.slug);
+      if(card) card.innerHTML = info?.hadithCount ? `${info.hadithCount} ${T("hadithCount")}` : naSpan();
+    }catch(e){
+      if(card) card.innerHTML = `<span class="na">${T("apiError")}</span>`;
+    }
+  });
+}
+
+/* ---------- /book/:slug ---------- */
+async function renderBookDetail(slug){
+  app.innerHTML = `
+    <section class="section container" style="padding-top:36px;">
+      <div class="breadcrumbs">
+        <a href="#/">${T("home")}</a><span class="sep">/</span>
+        <a href="#/books">${T("books")}</a><span class="sep">/</span>
+        <span>${esc(slug)}</span>
+      </div>
+      <div id="book-detail-slot">${loadingBlock()}</div>
+    </section>
+  `;
+  const slot = document.getElementById("book-detail-slot");
+  try{
+    const info = await HadithService.getBookInfo(slug);
+    if(!info){ slot.innerHTML = emptyBlock(T("notFoundHadith")); return; }
+    slot.innerHTML = `
+      <div class="section-head"><h2>${esc(info.title_ar)}</h2></div>
+      <div class="info-grid" style="margin-top:0;border-top:none;padding-top:0;margin-bottom:22px;">
+        <div class="info-item"><div class="lbl">${T("author")}</div><div class="val">${info.author?esc(info.author):naSpan()}</div></div>
+        <div class="info-item"><div class="lbl">${T("hadithCount")}</div><div class="val">${info.hadithCount ?? T("na")}</div></div>
+        <div class="info-item"><div class="lbl">${T("source")}</div><div class="val">${esc(info.source.name_ar)}</div></div>
+      </div>
+      <div class="filters" style="grid-template-columns:1fr auto;margin-bottom:16px;">
+        <input type="text" id="book-inline-search" placeholder="${T("searchInBook")}...">
+        <button class="btn btn-primary" id="book-inline-search-btn">${T("searchBtn")}</button>
+      </div>
+      <div id="book-hadiths-list">${loadingBlock()}</div>
+    `;
+    document.getElementById("book-inline-search-btn").addEventListener("click", ()=> runBookInlineSearch(slug));
+    document.getElementById("book-inline-search").addEventListener("keydown", e=>{ if(e.key==="Enter") runBookInlineSearch(slug); });
+    await runBookInlineSearch(slug, true);
+  }catch(e){
+    console.error(e);
+    slot.innerHTML = errorBlock();
+  }
+}
+
+let bookListFull = [];
+let bookListShown = 0;
+async function runBookInlineSearch(slug, initial){
+  const listSlot = document.getElementById("book-hadiths-list");
+  const q = initial ? "" : document.getElementById("book-inline-search").value.trim();
+  listSlot.innerHTML = loadingBlock();
+  try{
+    bookListFull = await HadithService.search(slug, { query: q });
+    bookListShown = 0;
+    renderBookListPage(slug);
+  }catch(e){
+    console.error(e);
+    listSlot.innerHTML = errorBlock();
+  }
+}
+function renderBookListPage(slug){
+  const listSlot = document.getElementById("book-hadiths-list");
+  const nextBatch = bookListFull.slice(0, bookListShown + PAGE_SIZE);
+  bookListShown = nextBatch.length;
+  if(!bookListFull.length){ listSlot.innerHTML = emptyBlock(T("noResults")); return; }
+  listSlot.innerHTML = `
+    ${nextBatch.map(h=>`
+      <a class="result-card" href="#/hadith/${slug}/${h.hadithNumber}">
+        <p class="rtext">${h.textAr ? esc(h.textAr.slice(0,180)) + (h.textAr.length>180?"…":"") : naSpan()}</p>
+        <div class="rmeta"><span>${T("hadithNumberCol")}: ${h.hadithNumber ?? T("na")}</span>${gradeToPill(h.grade)}</div>
+      </a>
+    `).join("")}
+    ${bookListShown < bookListFull.length ? `<div class="load-more-wrap"><button class="btn btn-outline" id="book-load-more">${T("loadMore")}</button></div>` : ""}
+  `;
+  const btn = document.getElementById("book-load-more");
+  if(btn) btn.addEventListener("click", ()=> renderBookListPage(slug));
+}
+
+/* ---------- /topics ---------- */
+const CURATED_TOPICS = [
+  { key:"topic-salah",    ar:"الصلاة",   fr:"La prière",     en:"Prayer",    q:"الصلاة" },
+  { key:"topic-sawm",     ar:"الصيام",   fr:"Le jeûne",       en:"Fasting",   q:"الصيام" },
+  { key:"topic-zakah",    ar:"الزكاة",   fr:"L'aumône",       en:"Zakat",     q:"الزكاة" },
+  { key:"topic-hajj",     ar:"الحج",     fr:"Le pèlerinage",  en:"Hajj",      q:"الحج" },
+  { key:"topic-akhlaq",   ar:"الأخلاق",  fr:"L'éthique",      en:"Ethics",    q:"الخلق" },
+  { key:"topic-iman",     ar:"الإيمان",  fr:"La foi",         en:"Faith",     q:"الإيمان" },
+  { key:"topic-ilm",      ar:"العلم",    fr:"Le savoir",      en:"Knowledge", q:"العلم" },
+  { key:"topic-usrah",    ar:"الأسرة",   fr:"La famille",     en:"Family",    q:"الأهل" },
+  { key:"topic-dua",      ar:"الدعاء",   fr:"L'invocation",   en:"Supplication", q:"الدعاء" },
+  { key:"topic-muamalat", ar:"المعاملات",fr:"Les transactions",en:"Transactions", q:"البيع" }
+];
+function renderTopics(){
+  app.innerHTML = `
+    <section class="section container" style="padding-top:40px;">
+      <div class="section-head"><h2>${T("topics")}</h2></div>
+      <div class="topic-banner">ℹ️ ${T("approxTopicNote")}</div>
+      <div class="topics-wrap">
+        ${CURATED_TOPICS.map(t=>`<a class="topic-chip" data-q="${esc(t.q)}" data-label="${esc(t[currentLang]||t.ar)}" href="#">${esc(t[currentLang]||t.ar)}</a>`).join("")}
+      </div>
+    </section>
+  `;
+  document.querySelectorAll(".topic-chip").forEach(chip=>{
+    chip.addEventListener("click", (e)=>{
+      e.preventDefault();
+      sessionStorage.setItem("hn_prefill_query", chip.dataset.q);
+      sessionStorage.setItem("hn_topic_hint", chip.dataset.label);
+      location.hash = "#/search";
+    });
+  });
+}
+
+/* ---------- /sources ---------- */
+async function renderSources(){
+  const books = HadithService.listBooks();
+  app.innerHTML = `
+    <section class="section container" style="padding-top:40px;">
+      <div class="section-head"><h2>${T("sources")}</h2></div>
+      <div class="source-card">
+        <h3>${esc(FawazAdapter.meta.name_ar)}</h3>
+        <div class="info-grid" style="margin-top:14px;">
+          <div class="info-item"><div class="lbl">${T("dataMethod")}</div><div class="val">${T("apiStaticFiles")}</div></div>
+          <div class="info-item"><div class="lbl">${T("originalSource")}</div><div class="val"><a href="${FawazAdapter.meta.url}" target="_blank" rel="noopener">${FawazAdapter.meta.url}</a></div></div>
+        </div>
+        <div class="lbl" style="margin-top:18px;">${T("booksInSource")}</div>
+        <div class="source-books-mini" id="source-books-mini">
+          ${books.map(b=>`<span data-slug="${b.slug}">${esc(b.title_ar)} — <span class="c">…</span></span>`).join("")}
+        </div>
+      </div>
+    </section>
+  `;
+  books.forEach(async b=>{
+    try{
+      const info = await HadithService.getBookInfo(b.slug);
+      const el = document.querySelector(`#source-books-mini span[data-slug="${b.slug}"] .c`);
+      if(el) el.textContent = info?.hadithCount ?? T("na");
+    }catch(e){
+      const el = document.querySelector(`#source-books-mini span[data-slug="${b.slug}"] .c`);
+      if(el) el.textContent = T("na");
+    }
+  });
+}
+
+/* ---------- /narrator/:id (غير مدعوم بعد — بصدق) ---------- */
+function renderNarratorUnavailable(){
+  app.innerHTML = `
+    <section class="section container" style="padding-top:70px;">
+      <div class="narrator-block">
+        <div class="ic">👤</div>
+        <h2>${T("narratorTitle")}</h2>
+        <p class="disabled-note" style="font-size:13px;line-height:1.9;">${T("narratorUnavailable")}</p>
+      </div>
+    </section>
+  `;
+}
+
+function router(){
+  const hash = location.hash.replace(/^#/, "") || "/";
+  const hadithMatch = hash.match(/^\/hadith\/([a-z]+)\/(\d+)$/);
+  const bookMatch = hash.match(/^\/book\/([a-z]+)$/);
+  const narratorMatch = hash.match(/^\/narrator\/(.+)$/);
+  const activeR = hadithMatch ? "/search" : bookMatch ? "/books" : hash;
+  document.querySelectorAll("#nav-links a, #bottom-nav a").forEach(a=>{
+    a.classList.toggle("active", a.dataset.r === activeR);
+  });
+
+  if(hash === "/") return renderHome();
+  if(hash === "/books") return renderBooks();
+  if(bookMatch) return renderBookDetail(bookMatch[1]);
+  if(hash === "/topics") return renderTopics();
+  if(hash === "/search"){
+    const q = sessionStorage.getItem("hn_prefill_query");
+    if(q){ sessionStorage.removeItem("hn_prefill_query"); return renderSearch({ query:q }); }
+    return renderSearch();
+  }
+  if(hadithMatch) return renderHadithDetail(hadithMatch[1], hadithMatch[2]);
+  if(narratorMatch) return renderNarratorUnavailable();
+  if(hash === "/sources") return renderSources();
+  if(hash === "/favorites") return renderComingSoon(T("favorites"));
+  return renderComingSoon(T("home"));
+}
+window.addEventListener("hashchange", router);
+
+/* =====================================================================
+   6) Boot
+   ===================================================================== */
+function updateTopDate(){
+  const d = new Date();
+  document.getElementById("topbar-date").textContent = d.toLocaleDateString(currentLang==="ar"?"ar-SA":currentLang==="fr"?"fr-FR":"en-US", { year:"numeric", month:"long", day:"numeric" });
+}
+
+initTheme();
+applyLangChrome();
+updateTopDate();
+router();
+
+window.addEventListener("load", ()=>{
+  setTimeout(()=> document.getElementById("site-loader").classList.add("hide"), 300);
+});
+</script>
+</body>
+</html>
